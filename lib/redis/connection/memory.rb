@@ -1449,7 +1449,6 @@ class Redis
 
       UNLOCK_SCRIPT_SHA = 'abcd'
       LOCK_SCRIPT_SHA = 'bcde'
-      EXTEND_LIFE_SCRIPT_SHA = 'cdef'
 
       def script(*args)
         case args[1]
@@ -1457,8 +1456,6 @@ class Redis
           UNLOCK_SCRIPT_SHA
         when Redlock::Client::RedisInstance::LOCK_SCRIPT
           LOCK_SCRIPT_SHA
-        when Redlock::Client::RedisInstance::EXTEND_LIFE_SCRIPT
-          EXTEND_LIFE_SCRIPT_SHA
         else
           raise Redis::CommandError, "ERR unknown command 'script'"
         end
@@ -1475,13 +1472,6 @@ class Redis
         when LOCK_SCRIPT_SHA
           if !exists(args[2]) || get(args[2]) == args[3]
             set(args[2], args[3], 'PX', args[4])
-          end
-        when EXTEND_LIFE_SCRIPT_SHA
-          if get(args[2]) == args[3]
-            expire(args[2], args[4])
-            0
-          else
-            1
           end
         else
           raise Redis::CommandError, "ERR unknown command 'evalsha'"
